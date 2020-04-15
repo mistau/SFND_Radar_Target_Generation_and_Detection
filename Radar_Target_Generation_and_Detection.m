@@ -9,13 +9,19 @@ clc;
 % Max Velocity = 100 m/s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+RangeMax = 200;
+RangeResolution = 1;
+c = 3e8;
+
 %speed of light = 3e8
 %% User Defined Range and Velocity of target
 % *%TODO* :
 % define the target's initial position and velocity. Note : Velocity
 % remains contant
- 
 
+TargetRange = 111;
+TargetVelocity = 50;      %% proper German speed on the autobahn
+ 
 
 %% FMCW Waveform Generation
 
@@ -24,6 +30,9 @@ clc;
 % Calculate the Bandwidth (B), Chirp Time (Tchirp) and Slope (slope) of the FMCW
 % chirp using the requirements above.
 
+B = c / (2 * RangeResolution);
+Tchirp = 5.5 * 2 * RangeMax / c;
+slope  = B / Tchirp;
 
 %Operating carrier frequency of Radar 
 fc= 77e9;             %carrier freq
@@ -56,22 +65,24 @@ td=zeros(1,length(t));
 
 for i=1:length(t)         
     
-    
     % *%TODO* :
     %For each time stamp update the Range of the Target for constant velocity. 
-    
+	
+    r_t(i) = TargetRange + TargetVelocity * t(i);
+    td(i) = r_t(i) * 2/c;  % get delay for target (2*range @ speed of light)
+	
     % *%TODO* :
     %For each time sample we need update the transmitted and
     %received signal. 
-    Tx(i) = 
-    Rx (i)  =
+    Tx(i) = cos(2*pi*(fc*t(i) + slope * t(i)^2/2));
+    Rx(i) = cos(2*pi*(fc*(t(i) - td(i)) + slope * (t(i) - td(i))^2 /2)); 
     
     % *%TODO* :
     %Now by mixing the Transmit and Receive generate the beat signal
     %This is done by element wise matrix multiplication of Transmit and
     %Receiver Signal
-    Mix(i) = 
-    
+    Mix(i) = Tx(i) * Rx(i);
+
 end
 
 %% RANGE MEASUREMENT
@@ -80,18 +91,19 @@ end
  % *%TODO* :
 %reshape the vector into Nr*Nd array. Nr and Nd here would also define the size of
 %Range and Doppler FFT respectively.
+trans = reshape(Mix, [Nr, Nd]);
 
  % *%TODO* :
-%run the FFT on the beat signal along the range bins dimension (Nr) and
-%normalize.
+rangeFFT = fft(trans, Nr);  %run the FFT on the beat signal along the range bins dimension (Nr)
+rangeFFT = rangeFFT ./ Nr;  %normalize.
 
  % *%TODO* :
-% Take the absolute value of FFT output
+rangeFFT = abs(rangeFFT);  % Take the absolute value of FFT output
 
  % *%TODO* :
 % Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
 % Hence we throw out half of the samples.
-
+rangeFFT = rangeFFT(1:Nr/2);
 
 %plotting the range
 figure ('Name','Range from First FFT')
@@ -99,7 +111,7 @@ subplot(2,1,1)
 
  % *%TODO* :
  % plot FFT output 
-
+plot(rangeFFT);
  
 axis ([0 200 0 1]);
 
@@ -140,10 +152,12 @@ figure,surf(doppler_axis,range_axis,RDM);
 
 % *%TODO* :
 %Select the number of Training Cells in both the dimensions.
+Tb = 3; %training band 
 
 % *%TODO* :
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
+Gb = 3;  %guard band
 
 % *%TODO* :
 % offset the threshold by SNR value in dB
