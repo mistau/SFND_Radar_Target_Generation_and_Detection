@@ -140,16 +140,18 @@ figure,surf(doppler_axis,range_axis,RDM);
 %Slide Window through the complete Range Doppler Map
 
 %Select the number of Training Cells in both the dimensions.
-Tr = 10; %training band  row
-Tc =  8; %training band colum
+Tr =  6; %training band range
+Td =  8; %training band doppler
 
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
-Gr = 4;  %guard band row
-Gc = 4;  %guard band colum
+Gr = 4;  %guard band range
+Gd = 4;  %guard band doppler
 
 % offset the threshold by SNR value in dB
-offset = 3;
+offset = 10;
+
+nTrainingCells = (2*Td+2*Gd+1) * (2*Tr+2*Gr+1) - (2*Gd+1)* (2*Gr+1);
 
 %Create a vector to store noise_level for each iteration on training cells
 noise_level = zeros(1,1);
@@ -165,33 +167,28 @@ noise_level = zeros(1,1);
 %it a value of 1, else equate it to 0.
 
 
-   % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
-   % CFAR
-
+% Use RDM[x,y] as the matrix from the output of 2D FFT for implementing CFAR
 [width,height] = size(RDM);
 RES = zeros( size(RDM) );
 
-for posx = Tr+Gr+1: width-(Tr+Gr)
-    for posy = Tc+Gc+1: height-(Tc+Gc)
-
-        %% iterate over surrounding
-        for row = posx-(Tr+Gr): posx+Tr+Gr 
-            for col = posy-(Tc+Gc): posy+Tc+Gc
+for posx = Td+Gd+1: width-(Td+Gd)
+    for posy = Tr+Gr+1: height-(Tr+Gr)
+        
+        noise_level = 0;
+        %iterate over surrounding
+        for row = posx-(Td+Gd): posx+Td+Gd 
+            for col = posy-(Tr+Gr): posy+Tr+Gr
                 %check if we are outside the guard area
-                if(abs(posx-col)>Gr || abs(posy-col)>Gc)
+                if(abs(posx-col)>Gd || abs(posy-row)>Gr)
                     noise_level = noise_level + db2pow(RDM(row,col));
                 end
             end
         end
+        threshold = pow2db(noise_level/ nTrainingCells);
+        threshold = threshold + offset;   % add SNR offset
         
-        threshold = pow2db(noise_level/ (2*(Tc+Gc+1)*2*(Tr+Gr+1)-(Gr*Gc)-1));
-        % add SNR offset
-        threshold = threshold + offset;
-        
-        if RDM(posx, posy) < threshold
-            RES(posx, posy) = 0;
-        else
-            RES(posx, posy) = 1.0;
+        if RDM(posx, posy) >= threshold
+            RES(posx, posy) = 100;
         end
     end
 end
