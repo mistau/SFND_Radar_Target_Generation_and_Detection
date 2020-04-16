@@ -61,4 +61,15 @@ The code provided with the template generated the output below which again shows
 ![](./report/fig_range_doppler.png)
 
 ## 2D CFAR
+The 2D CA CFAR implementation is following pretty exact the explanation given in the course.
+As I encountered issues with re-using the same array for input and output caused by overwriting data I decided to use
+a new array for the result (RES). As I initialize this array with 0 values the subsequent step to clear the value at the border
+is not required in my case.
+![](./report/cfar.png)
 
+I did some experiments with the number and shape of the training cells and manage to select value which lead to relatively small detected maximum only. 
+This routine yielded the following result which is located at the location of the target indicating the target's speed.
+
+![](./report/fig_cfar.png)
+
+I would expect that in real life finding optimal values for offset and training cells is much more of a challenge, this probably has to be updated depending on the situation.
