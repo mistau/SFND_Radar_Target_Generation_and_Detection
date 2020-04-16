@@ -3,7 +3,7 @@ Project from the Sensor Fusion Nanodegree of Udacity
 
 ## Project Overview
 
-![Processing Flow](https://github.com/mistau/SFND_Radar_Target_Generate_and_Detection/report//processing_flow.png)
+![](./report/processing_flow.png)
 
 The processing flow in the Matlab project consists of the following steps:
 - Moving Target Generation
@@ -15,18 +15,21 @@ The processing flow in the Matlab project consists of the following steps:
 
 ## System Requirements
 
+The radar systems requirements given for this project are outlined in the table below.
+
+![](./report/requirements.png)
 
 ## Target Generation
 
 For the target I decided to pick the following values.
-![Target](./report/TargetDefinition.png)
+![](./report/target_definition.png)
 
 ## FMCW Configuration
 
 Out of the system requirements parameters like bandwidth, chirp time and slope are generated
 using the formulars introduced in the course.
 
-![FMCW Configuration](report/WaveformGeneration.png)
+![](./report/waveform_generation.png)
 
 The calculated slope is 2.0455e+13 which matches the value giving in the rubic.
 
@@ -35,11 +38,11 @@ The calculated slope is 2.0455e+13 which matches the value giving in the rubic.
 The waveforms of the transmitted signal Tx, the received signal Rx and the mixer signal Mix are calculated
 using the formulas introduced in the course.
 
-![Signal Generation](report/SignalGeneration.png)
+![](./report/signal_generation.png)
 
 ## Range FFT
 
-![Range FFT](report/RangeMeasurement.png)
+![](./report/range_measurement.png)
 To perform the range FFT the following steps are performed: 
 - matrix gets transposed 
 - fft function is called
@@ -49,13 +52,13 @@ To perform the range FFT the following steps are performed:
 
 The generated output clearly shows our target.
 
-![Figure Range](report/FigureRange.png)
+![](./report/fig_range.png)
 
 ## Doppler FFT
 
 The code provided with the template generated the output below which again shows our target.
 
-![Figure Range Doppler](report/FigureRangeDoppler.png)
+![](./report/fig_range_doppler.png)
 
 ## 2D CFAR
 
