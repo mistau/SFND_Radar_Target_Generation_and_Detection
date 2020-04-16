@@ -15,6 +15,9 @@ The processing flow in the Matlab project consists of the following steps:
 
 ## System Requirements
 
+The radar systems requirements given for this project are outlined in the table below.
+
+![](./report/requirements.png)
 
 ## Target Generation
 
